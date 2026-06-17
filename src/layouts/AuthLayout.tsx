@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { BookOpen, ShieldCheck } from 'lucide-react'
 
 import { Brand } from '@/components/dashboard/Brand'
+import welcomeBg from '@/assets/images/Welcome.png'
 
 export function AuthLayout() {
   return (
@@ -15,7 +16,7 @@ export function AuthLayout() {
         className="relative z-10 hidden h-full flex-col justify-between text-white lg:flex"
         style={{ 
           clipPath: 'polygon(0 0, 96% 0, 100% 100%, 0 100%)',
-          backgroundImage: `linear-gradient(90deg, rgba(14, 23, 48, 0.82), rgba(14, 23, 48, 0.62)), url('/src/assets/images/Welcome.png')`,
+          backgroundImage: `linear-gradient(90deg, rgba(14, 23, 48, 0.82), rgba(14, 23, 48, 0.62)), url('${welcomeBg}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
