@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --navy: #0e1730;
+    --gold: #d89b1f;
+    --surface: #f4f7fa;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    @apply antialiased text-slate-800;
+    background-color: #f4f7fa;
+    font-family: 'Montserrat', system-ui, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  ::-webkit-scrollbar        { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track  { background: transparent; }
+  ::-webkit-scrollbar-thumb  { @apply rounded-full bg-slate-300; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-slate-400; }
+}
+
+@layer components {
+  /* ── Skeleton ──────────────────────────────────────────────────────── */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-slate-200/70;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full;
+    background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+    animation: shimmer 1.6s infinite;
+  }
+
+  /* ── Login aurora (actualizado a paleta navy/gold) ─────────────────── */
+  .login-aurora {
+    background:
+      radial-gradient(1100px 600px at 15% 10%, rgba(14,23,48,0.12), transparent 55%),
+      radial-gradient(800px 500px at 85% 20%, rgba(216,155,31,0.10), transparent 50%),
+      radial-gradient(700px 450px at 50% 100%, rgba(14,23,48,0.08), transparent 55%);
+  }
+
+  /* ── Gold accent bar (sidebar nav active) ─────────────────────────── */
+  .nav-active-bar {
+    position: relative;
+  }
+  .nav-active-bar::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 60%;
+    border-radius: 0 3px 3px 0;
+    background: #d89b1f;
+  }
+
+  /* ── Gold bottom accent (cards hover) ────────────────────────────── */
+  .card-hover-gold {
+    @apply transition-all duration-200;
+    border-bottom: 3px solid transparent;
+  }
+  .card-hover-gold:hover {
+    border-bottom-color: #d89b1f;
+    transform: translateY(-2px);
+  }
+}

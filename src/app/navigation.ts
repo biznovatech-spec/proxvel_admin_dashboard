@@ -1,0 +1,42 @@
+import {
+  LayoutDashboard,
+  MapPinned,
+  Megaphone,
+  Users,
+  Settings,
+  Smartphone,
+  type LucideIcon,
+} from 'lucide-react'
+
+export interface NavItem {
+  to: string
+  label: string
+  icon: LucideIcon
+  /** Etiqueta opcional (p.ej. "Próximamente"). */
+  hint?: string
+  end?: boolean
+}
+
+export interface NavSection {
+  title: string
+  items: NavItem[]
+}
+
+export const navSections: NavSection[] = [
+  {
+    title: 'Principal',
+    items: [
+      { to: '/', label: 'Resumen', icon: LayoutDashboard, end: true },
+      { to: '/destinos', label: 'Destinos turísticos', icon: MapPinned },
+      { to: '/anuncios', label: 'Anuncios internos', icon: Megaphone },
+    ],
+  },
+  {
+    title: 'Administración',
+    items: [
+      { to: '/usuarios', label: 'Usuarios', icon: Users },
+      { to: '/versiones', label: 'Versiones', icon: Smartphone },
+      { to: '/configuracion', label: 'Configuración', icon: Settings },
+    ],
+  },
+]
