@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { BookOpen, Image as ImageIcon, ShieldCheck } from 'lucide-react'
+import { BookOpen, ShieldCheck } from 'lucide-react'
 
 import { Brand } from '@/components/dashboard/Brand'
 
