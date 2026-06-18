@@ -46,10 +46,10 @@ export function MediaManager({ id }: { id: string }) {
   const media     = useAllDestinationMedia(id)
   const mutations = useMediaMutations(id)
 
-  const [galleryItems, setGalleryItems] = useState<MediaItem[]>([])
-  const [originalOrder, setOriginalOrder] = useState<MediaItem[]>([])
+  const [galleryItems, setGalleryItems] = useState<MediaItem[]>(() => media.data?.gallery ?? [])
+  const [originalOrder, setOriginalOrder] = useState<MediaItem[]>(() => media.data?.gallery ?? [])
   const [isDirty, setIsDirty]           = useState(false)
-  const [syncedData, setSyncedData]     = useState(media.data)
+  const [syncedData, setSyncedData]     = useState<typeof media.data>(undefined)
 
   // Sync cuando llegan datos del backend.
   // Patrón recomendado por React: ajustar estado durante el render (no en un

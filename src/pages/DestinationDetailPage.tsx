@@ -11,6 +11,8 @@ import {
   Save,
   X,
   Info,
+  Star,
+  MessageSquare,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -22,7 +24,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { ErrorState } from '@/components/feedback/ErrorState'
-import { useDestinationDetail, useUpdateDestination, useUpdateAbsaScores } from '@/hooks/useDestinations'
+import { useDestinationDetail, useUpdateDestination, useUpdateAbsaScores, useDestinationReviews } from '@/hooks/useDestinations'
 import { MediaManager } from '@/pages/MediaManagerPage'
 import type { AspectScores } from '@/types'
 import { cn } from '@/lib/utils'
@@ -147,7 +149,9 @@ export function DestinationDetailPage() {
 
   const [searchParams] = useSearchParams()
   const defaultTab = searchParams.get('tab') === 'multimedia' ? 'media' : 'info'
-  const [activeTab, setActiveTab] = useState<'info' | 'media' | 'context' | 'tech'>(defaultTab)
+  const [activeTab, setActiveTab] = useState<'info' | 'media' | 'context' | 'tech' | 'comments'>(defaultTab as any)
+
+  const { data: reviewsData, isLoading: isLoadingReviews } = useDestinationReviews(id)
 
   const [isEditingInfo, setIsEditingInfo] = useState(false)
   const [isEditingContext, setIsEditingContext] = useState(false)
@@ -338,6 +342,17 @@ export function DestinationDetailPage() {
           )}
         >
           Estado técnico
+        </button>
+        <button
+          onClick={() => setActiveTab('comments')}
+          className={cn(
+            'px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap',
+            activeTab === 'comments'
+              ? 'border-jungle-600 text-jungle-700'
+              : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+          )}
+        >
+          Comentarios
         </button>
       </div>
 
@@ -615,6 +630,88 @@ export function DestinationDetailPage() {
                   <Field label="Portada Configurada" value={data.cover_image_url ? "Sí" : "No"} />
                   <Field label="Galería Configurada" value={gallery.length > 0 ? "Sí" : "No"} />
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* TAB COMENTARIOS */}
+        {activeTab === 'comments' && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5 text-jungle-600" />
+                  Comentarios y Reseñas
+                </CardTitle>
+                <Badge variant="secondary">{reviewsData?.length || 0} reseñas</Badge>
+              </CardHeader>
+              <CardContent>
+                {isLoadingReviews ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-24 w-full rounded-xl" />
+                    <Skeleton className="h-24 w-full rounded-xl" />
+                  </div>
+                ) : !reviewsData || reviewsData.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                    <MessageSquare className="mb-3 h-10 w-10 text-slate-200" />
+                    <p>Aún no hay comentarios para este destino.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {reviewsData.map((review) => (
+                      <div key={review.review_id} className="flex flex-col sm:flex-row gap-4 rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+                        {review.image_url ? (
+                          <div className="h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-200">
+                            <img src={review.image_url} alt="Review" className="h-full w-full object-cover" />
+                          </div>
+                        ) : (
+                          <div className="flex h-24 w-24 shrink-0 flex-col items-center justify-center rounded-lg bg-jungle-50 text-jungle-600 border border-jungle-100">
+                            <span className="text-2xl font-bold">{review.rating_general.toFixed(1)}</span>
+                            <div className="flex items-center mt-1">
+                              <Star className="h-3 w-3 fill-current" />
+                            </div>
+                          </div>
+                        )}
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="font-medium text-slate-800 line-clamp-2">"{review.review_text}"</p>
+                              <p className="text-xs text-slate-500 mt-1">
+                                Usuario ID: {review.user_id.slice(0, 8)}... • {review.processing_month || 'Fecha desconocida'}
+                              </p>
+                            </div>
+                            {review.image_url && (
+                              <div className="flex items-center gap-1 shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+                                <Star className="h-3 w-3 fill-jungle-500 text-jungle-500" />
+                                {review.rating_general.toFixed(1)}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {review.aspect_ratings && review.aspect_ratings.length > 0 && (
+                            <div className="pt-2 border-t border-slate-200/60 flex flex-wrap gap-2">
+                              {review.aspect_ratings.map((aspect, idx) => (
+                                <div key={idx} className="flex items-center gap-1.5 rounded-md bg-white px-2 py-1 text-[11px] border border-slate-200 shadow-sm">
+                                  <span className="font-medium text-slate-600 capitalize">{aspect.aspect}</span>
+                                  <span className="flex items-center text-slate-400">
+                                    <Star className="h-2.5 w-2.5 fill-current text-amber-400 mr-0.5" />
+                                    {aspect.rating.toFixed(1)}
+                                  </span>
+                                  {aspect.comment && (
+                                    <span className="text-slate-400 ml-1 italic line-clamp-1 max-w-[150px]">
+                                      "{aspect.comment}"
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

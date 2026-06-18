@@ -36,6 +36,14 @@ export function useDestinationDetail(id: string | undefined) {
   })
 }
 
+export function useDestinationReviews(id: string | undefined) {
+  return useQuery({
+    queryKey: ['destinations', 'reviews', id],
+    queryFn: () => import('@/api/endpoints').then(m => m.reviewsApi.forDestination(id as string)),
+    enabled: Boolean(id),
+  })
+}
+
 export function useCreateDestination() {
   const queryClient = useQueryClient()
   return useMutation({

@@ -128,6 +128,24 @@ export interface DestinationDetail extends DestinationSummary {
   tourism_info: TourismInfo | null
 }
 
+export interface ReviewAspectRating {
+  aspect: string
+  rating: number
+  comment?: string | null
+}
+
+export interface Review {
+  review_id: string
+  user_id: string
+  destination_id: string
+  rating_general: number
+  review_text: string
+  status: string
+  processing_month?: string | null
+  aspect_ratings: ReviewAspectRating[]
+  image_url?: string | null
+}
+
 /* -------------------------------------------------------------------------- */
 /* Multimedia                                                                  */
 /* -------------------------------------------------------------------------- */

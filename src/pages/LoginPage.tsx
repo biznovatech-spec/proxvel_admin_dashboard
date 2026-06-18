@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -25,6 +25,39 @@ export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [showPassword, setShowPassword] = useState(false)
+
+  const words = ['PROXVEL', 'tu Próximo Viaje']
+  const [text, setText] = useState('PROXVEL')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [loopNum, setLoopNum] = useState(0)
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    const currentWord = words[loopNum % words.length]
+
+    if (isDeleting) {
+      if (text === '') {
+        setIsDeleting(false)
+        setLoopNum((prev) => prev + 1)
+      } else {
+        timer = setTimeout(() => {
+          setText(currentWord.substring(0, text.length - 1))
+        }, 50)
+      }
+    } else {
+      if (text === currentWord) {
+        timer = setTimeout(() => {
+          setIsDeleting(true)
+        }, 3000)
+      } else {
+        timer = setTimeout(() => {
+          setText(currentWord.substring(0, text.length + 1))
+        }, 80)
+      }
+    }
+
+    return () => clearTimeout(timer)
+  }, [text, isDeleting, loopNum])
 
   const {
     register,
@@ -59,8 +92,9 @@ export function LoginPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="font-serif text-[2.4rem] font-bold leading-[1.1] tracking-[-0.03em] text-[#0E1730]">
-          Bienvenido a PROXVEL
+        <h1 className="min-h-[5.5rem] font-serif text-[2.4rem] font-bold leading-[1.1] tracking-[-0.03em] text-[#0E1730]">
+          Bienvenido a <span className="text-[#D89B1F]">{text}</span>
+          <span className="animate-pulse font-light text-[#D89B1F]">|</span>
         </h1>
         <p className="mt-3 text-[15px] text-[#64748B]">
           Accede a tu panel administrativo para continuar.

@@ -22,6 +22,7 @@ import type {
   MediaType,
   MetricsOverview,
   ReleaseCreatePayload,
+  Review,
   UserRole,
 } from '@/types'
 
@@ -56,6 +57,13 @@ export const destinationsApi = {
   },
   async detail(id: string): Promise<DestinationDetail> {
     const { data } = await apiClient.get<ApiEnvelope<DestinationDetail>>(`/destinations/${id}`)
+    return unwrap(data)
+  },
+}
+
+export const reviewsApi = {
+  async forDestination(id: string): Promise<Review[]> {
+    const { data } = await apiClient.get<ApiEnvelope<Review[]>>(`/reviews/destination/${id}`)
     return unwrap(data)
   },
 }
