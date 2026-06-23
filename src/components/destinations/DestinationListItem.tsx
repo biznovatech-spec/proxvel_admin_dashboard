@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Eye, MapPin, Power, PowerOff } from 'lucide-react'
+import { Eye, MapPin, Power, PowerOff, Trash2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
-import { useSetDestinationStatus } from '@/hooks/useDestinations'
+import { useSetDestinationStatus, useDeleteDestination } from '@/hooks/useDestinations'
 import { cn } from '@/lib/utils'
 import type { DestinationSummary } from '@/types'
 
@@ -19,7 +19,9 @@ export function DestinationListItem({ destination, index = 0 }: Props) {
   const hasCover = Boolean(destination.cover_image_url)
   const isActive = destination.is_active
   const setStatus = useSetDestinationStatus()
+  const deleteDest = useDeleteDestination()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 
   return (
     <motion.div
@@ -63,11 +65,23 @@ export function DestinationListItem({ destination, index = 0 }: Props) {
             <Badge variant="warning" className="shadow">Sin portada</Badge>
           )}
         </div>
-        {!isActive && (
-          <div className="absolute right-3 top-3">
+        <div className="absolute right-3 top-3 flex flex-col gap-1 items-end">
+          {isActive ? (
+            <Badge variant="success" className="shadow bg-emerald-600 hover:bg-emerald-700">Activo</Badge>
+          ) : (
             <Badge variant="danger" className="shadow">Inactivo</Badge>
-          </div>
-        )}
+          )}
+          
+          {destination.data_status === 'pending_info' && (
+            <Badge variant="warning" className="shadow text-[10px]">Pendiente de info</Badge>
+          )}
+          {destination.data_status === 'metrics_incomplete' && (
+            <Badge variant="danger" className="shadow bg-rose-600 hover:bg-rose-700 text-[10px]">Métricas incompletas</Badge>
+          )}
+          {destination.data_status === 'out_of_engine' && (
+            <Badge variant="neutral" className="shadow bg-slate-700 text-white hover:bg-slate-800 text-[10px]">Fuera del motor</Badge>
+          )}
+        </div>
       </div>
 
       {/* Info */}
@@ -95,8 +109,8 @@ export function DestinationListItem({ destination, index = 0 }: Props) {
           </code>
         </div>
 
-        <div className="mt-auto flex gap-2">
-          <Button asChild variant="secondary" size="sm" className="flex-1">
+        <div className="mt-auto flex flex-wrap gap-2">
+          <Button asChild variant="secondary" size="sm" className="flex-1 min-w-[110px]">
             <Link to={`/destinos/${destination.destination_id}`}>
               <Eye className="h-4 w-4" />
               Gestionar
@@ -105,12 +119,24 @@ export function DestinationListItem({ destination, index = 0 }: Props) {
           <Button
             variant={isActive ? 'ghost' : 'primary'}
             size="sm"
+            className="flex-1 min-w-[110px]"
             onClick={() => setConfirmOpen(true)}
             loading={setStatus.isPending}
+            disabled={!isActive && destination.data_status !== 'ready'}
             leftIcon={isActive ? <PowerOff className="h-4 w-4" /> : <Power className="h-4 w-4" />}
-            title={isActive ? 'Desactivar destino' : 'Activar destino'}
+            title={isActive ? 'Desactivar destino' : (!isActive && destination.data_status !== 'ready') ? 'No se puede activar: no cumple con métricas o info' : 'Activar destino'}
           >
             {isActive ? 'Desactivar' : 'Activar'}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="px-2 text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+            title="Eliminar destino permanentemente"
+            onClick={() => setDeleteConfirmOpen(true)}
+            loading={deleteDest.isPending}
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -132,6 +158,26 @@ export function DestinationListItem({ destination, index = 0 }: Props) {
             { id: destination.destination_id, isActive: !isActive },
             { onSuccess: () => setConfirmOpen(false) },
           )
+        }
+      />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Eliminar destino permanentemente"
+        description={
+          <span className="flex flex-col gap-2">
+            <span>¿Estás seguro de eliminar el destino <strong>{destination.destination}</strong>?</span>
+            <span className="text-rose-600 font-medium">Esta acción borrará todas sus fotos, puntajes, métricas, y los favoritos, reseñas y visitas creadas por los usuarios sobre este destino. No se puede deshacer.</span>
+          </span>
+        }
+        confirmLabel="Sí, eliminar"
+        variant="danger"
+        loading={deleteDest.isPending}
+        onConfirm={() =>
+          deleteDest.mutate(destination.destination_id, {
+            onSuccess: () => setDeleteConfirmOpen(false),
+          })
         }
       />
     </motion.div>

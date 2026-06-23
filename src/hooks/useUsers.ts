@@ -13,6 +13,15 @@ export function useUsers() {
   })
 }
 
+export function useUserDetails(userId: string | null) {
+  return useQuery({
+    queryKey: ['users', 'details', userId],
+    queryFn: () => (userId ? usersApi.getDetails(userId) : Promise.reject('No ID')),
+    enabled: !!userId,
+    staleTime: 60_000,
+  })
+}
+
 export function useCreateUser() {
   const queryClient = useQueryClient()
   return useMutation({

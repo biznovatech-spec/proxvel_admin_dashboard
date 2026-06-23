@@ -17,6 +17,7 @@ import type {
   DestinationDetail,
   DestinationMedia,
   DestinationSummary,
+  DestinationUpdatePayload,
   LoginResponse,
   MediaItem,
   MediaType,
@@ -74,6 +75,10 @@ export const adminDestinationsApi = {
     const { data } = await apiClient.get<ApiEnvelope<DestinationSummary[]>>('/admin/destinations')
     return unwrap(data)
   },
+  async detail(id: string): Promise<DestinationDetail> {
+    const { data } = await apiClient.get<ApiEnvelope<DestinationDetail>>(`/admin/destinations/${id}`)
+    return unwrap(data)
+  },
   async create(payload: import('@/types').DestinationAdminCreate): Promise<{ destination_id: string; destination: string; city?: string | null; region?: string | null; category?: string | null }> {
     const { data } = await apiClient.post<ApiEnvelope<{ destination_id: string; destination: string; city?: string | null; region?: string | null; category?: string | null }>>('/admin/destinations', payload)
     return unwrap(data)
@@ -89,7 +94,7 @@ export const adminDestinationsApi = {
     )
     return unwrap(data)
   },
-  async update(id: string, payload: Partial<{ name: string; city: string; region: string; category: string; description: string; official_source_name: string; official_source_url: string }>): Promise<DestinationDetail> {
+  async update(id: string, payload: DestinationUpdatePayload): Promise<DestinationDetail> {
     const { data } = await apiClient.patch<ApiEnvelope<DestinationDetail>>(`/admin/destinations/${id}`, payload)
     return unwrap(data)
   },
@@ -99,6 +104,19 @@ export const adminDestinationsApi = {
   },
   async permanentDelete(destinationId: string, mediaId: number): Promise<void> {
     await apiClient.delete(`/admin/destinations/${destinationId}/media/${mediaId}/permanent`)
+  },
+  async syncFromMetrics(): Promise<Record<string, unknown>> {
+    const { data } = await apiClient.post<ApiEnvelope<Record<string, unknown>>>('/admin/destinations/sync-from-metrics')
+    return unwrap(data)
+  },
+  async remove(id: string): Promise<void> {
+    await apiClient.delete(`/admin/destinations/${id}`)
+  },
+  async mergeInto(sourceId: string, targetId: string): Promise<Record<string, unknown>> {
+    const { data } = await apiClient.post<ApiEnvelope<Record<string, unknown>>>(
+      `/admin/destinations/${sourceId}/merge-into/${targetId}`,
+    )
+    return unwrap(data)
   },
 }
 
@@ -154,6 +172,10 @@ export const usersApi = {
     const { data } = await apiClient.get<ApiEnvelope<AdminUser[]>>('/admin/users')
     return unwrap(data)
   },
+  async getDetails(userId: string): Promise<import('@/types').AdminUserDetails> {
+    const { data } = await apiClient.get<ApiEnvelope<import('@/types').AdminUserDetails>>(`/admin/users/${userId}/details`)
+    return unwrap(data)
+  },
   async create(payload: CreateUserPayload): Promise<AdminUser> {
     const { data } = await apiClient.post<ApiEnvelope<AdminUser>>('/admin/users', payload)
     return unwrap(data)
@@ -176,6 +198,10 @@ export const usersApi = {
 export const metricsApi = {
   async overview(): Promise<MetricsOverview> {
     const { data } = await apiClient.get<ApiEnvelope<MetricsOverview>>('/admin/metrics/overview')
+    return unwrap(data)
+  },
+  async charts(): Promise<import('@/types').ChartData> {
+    const { data } = await apiClient.get<ApiEnvelope<import('@/types').ChartData>>('/admin/metrics/charts')
     return unwrap(data)
   },
 }
@@ -249,6 +275,34 @@ export const releasesApi = {
   },
   async remove(id: number): Promise<void> {
     await apiClient.delete(`/admin/releases/${id}`)
+  },
+}
+
+/* ------------------------------- Importación ------------------------------ */
+
+export type ImportType = 'absa' | 'tags' | 'clima' | 'aforo'
+
+export interface ImportResult {
+  type: ImportType
+  rows_processed?: number
+  destinations_created?: number
+  scores_updated?: number
+  records_updated?: number
+  errors?: number
+  status?: string
+  message?: string
+}
+
+export const importApi = {
+  async upload(type: ImportType, file: File): Promise<ImportResult> {
+    const form = new FormData()
+    form.append('file', file)
+    const { data } = await apiClient.post<ApiEnvelope<ImportResult>>(
+      `/admin/import/${type}`,
+      form,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    )
+    return unwrap(data)
   },
 }
 

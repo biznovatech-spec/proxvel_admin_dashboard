@@ -32,7 +32,7 @@ export function LoginPage() {
   const [loopNum, setLoopNum] = useState(0)
 
   useEffect(() => {
-    let timer: NodeJS.Timeout
+    let timer: ReturnType<typeof setTimeout>
     const currentWord = words[loopNum % words.length]
 
     if (isDeleting) {

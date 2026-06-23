@@ -5,6 +5,7 @@ import {
   Users,
   Settings,
   Smartphone,
+  Upload,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -35,6 +36,7 @@ export const navSections: NavSection[] = [
     title: 'Administración',
     items: [
       { to: '/usuarios', label: 'Usuarios', icon: Users },
+      { to: '/importar-datos', label: 'Importar datos', icon: Upload },
       { to: '/versiones', label: 'Versiones', icon: Smartphone },
       { to: '/configuracion', label: 'Configuración', icon: Settings },
     ],

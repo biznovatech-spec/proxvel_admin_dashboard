@@ -12,6 +12,7 @@ import { ErrorState } from '@/components/feedback/ErrorState'
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog'
 import { CreateUserDialog } from '@/components/users/CreateUserDialog'
 import { DeleteUserDialog } from '@/components/users/DeleteUserDialog'
+import { UserDetailsDialog } from '@/components/users/UserDetailsDialog'
 import { useAuth } from '@/auth/useAuth'
 import { useUsers, useUpdateUserRole, useUpdateUserStatus } from '@/hooks/useUsers'
 import type { AdminUser, UserRole } from '@/types'
@@ -63,6 +64,7 @@ export function UsersPage() {
   // Extensión 6B: dialogs
   const [showCreateDialog, setShowCreateDialog] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null)
+  const [detailsTarget, setDetailsTarget] = useState<string | null>(null)
 
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
@@ -170,9 +172,17 @@ export function UsersPage() {
                   <tr key={u.user_id} className="hover:bg-slate-50/60">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">
-                          {(u.name || u.email).slice(0, 1).toUpperCase()}
-                        </div>
+                        {u.avatar_url ? (
+                          <img
+                            src={u.avatar_url}
+                            alt={u.name || 'Avatar'}
+                            className="h-9 w-9 shrink-0 rounded-full object-cover border border-slate-200"
+                          />
+                        ) : (
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-navy-900 text-xs font-bold text-white">
+                            {(u.name || u.email).slice(0, 1).toUpperCase()}
+                          </div>
+                        )}
                         <div className="min-w-0">
                           <p className="truncate font-semibold text-slate-900">
                             {u.name || '—'}
@@ -211,6 +221,15 @@ export function UsersPage() {
                     {isSuperAdmin && (
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Ver detalles"
+                            onClick={() => setDetailsTarget(u.user_id)}
+                            className="text-slate-500 hover:text-navy-700"
+                          >
+                            <Info className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant={u.is_active ? 'ghost' : 'primary'}
                             size="sm"
@@ -289,6 +308,12 @@ export function UsersPage() {
         open={deleteTarget !== null}
         onOpenChange={(o) => { if (!o) setDeleteTarget(null) }}
         user={deleteTarget}
+      />
+
+      <UserDetailsDialog
+        userId={detailsTarget}
+        open={detailsTarget !== null}
+        onOpenChange={(o) => { if (!o) setDetailsTarget(null) }}
       />
     </div>
   )

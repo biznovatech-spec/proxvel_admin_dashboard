@@ -35,6 +35,13 @@ export interface AdminUser {
   role: UserRole
   is_active: boolean
   created_at: string
+  avatar_url?: string | null
+}
+
+/** Detalles completos de usuario (Extensión de lectura) */
+export interface AdminUserDetails extends AdminUser {
+  favorites_count: number
+  aspects: string[]
 }
 
 /** Payload para crear usuario desde el dashboard (Extensión 6B). */
@@ -89,6 +96,7 @@ export interface DestinationSummary {
   cover_image_url: string | null
   official_source_name: string | null
   is_active: boolean
+  data_status?: string | null
 }
 
 export interface AspectScores {
@@ -113,11 +121,35 @@ export interface ContextScores {
 
 export interface TourismInfo {
   official_name?: string | null
+  // Ubicación administrativa
+  department?: string | null
+  province?: string | null
+  district?: string | null
+  // Clasificación
+  type?: string | null
+  subtype?: string | null
+  hierarchy?: number | null
+  altitude_m?: number | null
+  // Descripción / experiencia
   description?: string | null
   experience_type?: string | null
+  visitor_info_summary?: string | null
+  activities_summary?: string | null
+  accessibility_summary?: string | null
+  // Geolocalización
+  latitude?: number | null
+  longitude?: number | null
+  geofence_radius_m?: number | null
+  // Multimedia
   gallery_images?: string[]
+  // Fuentes
   official_source_name?: string | null
+  official_source_code?: string | null
   official_source_url?: string | null
+  secondary_source_name?: string | null
+  secondary_source_code?: string | null
+  secondary_source_url?: string | null
+  map_source?: string | null
 }
 
 export interface DestinationDetail extends DestinationSummary {
@@ -126,6 +158,37 @@ export interface DestinationDetail extends DestinationSummary {
   weather_detail: Record<string, unknown> | null
   crowd_detail: Record<string, unknown> | null
   tourism_info: TourismInfo | null
+}
+
+/** Payload de actualización admin: cubre todos los campos editables del catálogo. */
+export interface DestinationUpdatePayload {
+  name?: string
+  official_name?: string
+  department?: string
+  province?: string
+  district?: string
+  city?: string
+  region?: string
+  category?: string
+  type?: string
+  subtype?: string
+  hierarchy?: number | null
+  altitude_m?: number | null
+  description?: string
+  experience_type?: string
+  visitor_info_summary?: string
+  activities_summary?: string
+  accessibility_summary?: string
+  latitude?: number | null
+  longitude?: number | null
+  geofence_radius_m?: number | null
+  official_source_name?: string
+  official_source_code?: string
+  official_source_url?: string
+  secondary_source_name?: string
+  secondary_source_code?: string
+  secondary_source_url?: string
+  map_source?: string
 }
 
 export interface ReviewAspectRating {
@@ -263,4 +326,11 @@ export interface AnnouncementPayload {
   duration_seconds: number
   priority: number
   is_active: boolean
+}
+
+export interface ChartData {
+  user_growth: { month: string; users: number }[]
+  reviews_by_month: { month: string; reviews: number }[]
+  destinations_by_category: { name: string; value: number }[]
+  destinations_by_region: { name: string; value: number }[]
 }

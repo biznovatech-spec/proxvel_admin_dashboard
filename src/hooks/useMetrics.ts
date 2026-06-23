@@ -10,6 +10,15 @@ export function useMetricsOverview() {
   })
 }
 
+export function useChartMetrics() {
+  return useQuery({
+    queryKey: ['metrics', 'charts'],
+    queryFn: metricsApi.charts,
+    staleTime: 300_000, // 5 min
+    retry: 1,
+  })
+}
+
 export function useSystemHealth() {
   return useQuery({
     queryKey: ['system', 'health'],

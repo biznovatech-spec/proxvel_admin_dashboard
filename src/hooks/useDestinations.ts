@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { destinationsApi, adminDestinationsApi } from '@/api/endpoints'
+import { adminDestinationsApi } from '@/api/endpoints'
 import { getApiErrorMessage } from '@/api/apiClient'
 import type { AspectScores, DestinationAdminCreate } from '@/types'
 
@@ -31,7 +31,7 @@ export function useSetDestinationStatus() {
 export function useDestinationDetail(id: string | undefined) {
   return useQuery({
     queryKey: ['destinations', 'detail', id],
-    queryFn: () => destinationsApi.detail(id as string),
+    queryFn: () => adminDestinationsApi.detail(id as string),
     enabled: Boolean(id),
   })
 }
@@ -80,5 +80,45 @@ export function useUpdateAbsaScores() {
       queryClient.invalidateQueries({ queryKey: ['destinations', 'detail', variables.id] })
     },
     onError: (err) => toast.error(getApiErrorMessage(err, 'No se pudieron guardar los puntajes ABSA')),
+  })
+}
+
+export function useSyncFromMetrics() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => adminDestinationsApi.syncFromMetrics(),
+    onSuccess: () => {
+      toast.success('Sincronización completada')
+      queryClient.invalidateQueries({ queryKey: ['destinations', 'list'] })
+      queryClient.invalidateQueries({ queryKey: ['metrics'] })
+    },
+    onError: (err) => toast.error(getApiErrorMessage(err, 'No se pudo sincronizar con las métricas')),
+  })
+}
+
+export function useDeleteDestination() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => adminDestinationsApi.remove(id),
+    onSuccess: () => {
+      toast.success('Destino eliminado permanentemente')
+      queryClient.invalidateQueries({ queryKey: ['destinations', 'list'] })
+      queryClient.invalidateQueries({ queryKey: ['metrics'] })
+    },
+    onError: (err) => toast.error(getApiErrorMessage(err, 'No se pudo eliminar el destino')),
+  })
+}
+
+export function useMergeDestination() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ sourceId, targetId }: { sourceId: string; targetId: string }) =>
+      adminDestinationsApi.mergeInto(sourceId, targetId),
+    onSuccess: () => {
+      toast.success('Destinos fusionados correctamente')
+      queryClient.invalidateQueries({ queryKey: ['destinations', 'list'] })
+      queryClient.invalidateQueries({ queryKey: ['metrics'] })
+    },
+    onError: (err) => toast.error(getApiErrorMessage(err, 'No se pudo fusionar los destinos')),
   })
 }

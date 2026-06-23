@@ -12,6 +12,7 @@ import { DestinationDetailPage } from '@/pages/DestinationDetailPage'
 import { AnnouncementsPage } from '@/pages/AnnouncementsPage'
 import { AnnouncementEditorPage } from '@/pages/AnnouncementEditorPage'
 import { ExcelImportPage } from '@/pages/ExcelImportPage'
+import { ImportDataPage } from '@/pages/ImportDataPage'
 import { UsersPage } from '@/pages/UsersPage'
 import { ReleasesPage } from '@/pages/ReleasesPage'
 import { SettingsPage } from '@/pages/SettingsPage'
@@ -39,6 +40,7 @@ export function AppRouter() {
             <Route path="anuncios/nuevo" element={<AnnouncementEditorPage />} />
             <Route path="anuncios/:id" element={<AnnouncementEditorPage />} />
             <Route path="usuarios" element={<UsersPage />} />
+            <Route path="importar-datos" element={<ImportDataPage />} />
             <Route path="versiones" element={<ReleasesPage />} />
             <Route path="configuracion" element={<SettingsPage />} />
           </Route>
