@@ -14,8 +14,6 @@ import {
   CheckCircle2,
   Clock,
   BarChart3,
-  FileSpreadsheet,
-  Settings,
   ChevronRight,
   Lightbulb,
 } from 'lucide-react'
@@ -32,8 +30,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
   Legend
 } from 'recharts'
 
@@ -393,7 +389,7 @@ export function DashboardHomePage() {
                     paddingAngle={2}
                     dataKey="value"
                   >
-                    {c.destinations_by_category.map((entry, index) => {
+                    {c.destinations_by_category.map((_, index) => {
                       const colors = ['#d89b1f', '#0f172a', '#059669', '#7c3aed', '#e11d48', '#0ea5e9']
                       return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                     })}
@@ -558,25 +554,3 @@ function StatusRow({ label, value, status }: any) {
   )
 }
 
-function ModuleCard({ icon, title, status, statusColor }: any) {
-  const badges: any = {
-    blue: 'bg-blue-50 text-blue-700 border-blue-100',
-    jungle: 'bg-jungle-50 text-jungle-700 border-jungle-100',
-    amber: 'bg-amber-50 text-amber-700 border-amber-100',
-    purple: 'bg-purple-50 text-purple-700 border-purple-100',
-  }
-  
-  return (
-    <div className="flex flex-col items-center justify-center p-4 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors text-center">
-      <div className="h-12 w-12 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center mb-3">
-        {icon}
-      </div>
-      <h4 className="text-xs font-bold text-slate-800 mb-2 h-8 flex items-center justify-center leading-tight">
-        {title}
-      </h4>
-      <div className={cn("px-2 py-0.5 rounded-md text-[10px] font-bold border", badges[statusColor])}>
-        {status}
-      </div>
-    </div>
-  )
-}

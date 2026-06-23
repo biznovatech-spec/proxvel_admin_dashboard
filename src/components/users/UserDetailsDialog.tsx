@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { MapPinned, User as UserIcon, Calendar, Compass } from 'lucide-react'
+import { MapPinned, Calendar, Compass } from 'lucide-react'
 import { useUserDetails } from '@/hooks/useUsers'
 
 interface Props {
@@ -108,7 +108,7 @@ export function UserDetailsDialog({ userId, open, onOpenChange }: Props) {
               {user.aspects && user.aspects.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {user.aspects.map((aspect) => (
-                    <Badge key={aspect} variant="secondary" className="font-normal text-slate-700 bg-slate-100">
+                    <Badge key={aspect} variant="neutral" className="font-normal text-slate-700 bg-slate-100">
                       {aspect}
                     </Badge>
                   ))}
